@@ -7,6 +7,8 @@ public class PlayerInventory : MonoBehaviour
     private List<Item> inventory = new List<Item>();  // 아이템 리스트
     private Item currentItem;  // 현재 선택된 아이템
 
+    public PlayerController playerController;  // PlayerController 참조
+
     public StaminaManager staminaManager;
     public HealthManager healthManager;
 
@@ -65,6 +67,12 @@ public class PlayerInventory : MonoBehaviour
         if (item.defensePower > 0)
         {
             Debug.Log($"방어력이 {item.defensePower}만큼 증가했습니다.");
+        }
+
+        if (item.speedIncreaseAmount > 0 && playerController != null)
+        {
+            playerController.ApplySpeedBoost(item.speedIncreaseAmount, item.speedIncreaseDuration);
+            Debug.Log($"속도가 {item.speedIncreaseDuration}초 동안 {item.speedIncreaseAmount}배 증가했습니다.");
         }
     }
 }

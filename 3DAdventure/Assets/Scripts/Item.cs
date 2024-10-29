@@ -12,6 +12,8 @@ public class Item : ScriptableObject
     public int healthRestore;       // 체력 회복량
     public int attackPower;         // 공격력
     public int defensePower;        // 방어력
-    public int staminaRestore;
+    public int staminaRestore;      // 스테미나 회복량
+    public float speedIncreaseAmount;   // 속도 증가량
+    public float speedIncreaseDuration; // 속도 증가 지속 시간
     public bool isConsumable;       // 소비형 아이템인지 여부
 }

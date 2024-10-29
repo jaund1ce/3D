@@ -6,6 +6,9 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 5f;
+    private float originalSpeed;      // 원래 속도 저장
+    private bool isSpeedBoosted = false;
+    private float speedBoostEndTime;
     public float sprintSpeed = 8f;
     public float jumpForce = 5f;
     public float mouseSensitivity = 100f;
@@ -27,6 +30,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         playerCamera = Camera.main.transform;
+        originalSpeed = moveSpeed;    // 기본 속도 저장
 
         // HealthManager와 StaminaManager를 연결
         healthManager = GetComponent<HealthManager>();
@@ -41,10 +45,16 @@ public class PlayerController : MonoBehaviour
     {
         // WASD 움직임 및 달리기
         float speed = Input.GetKey(KeyCode.LeftShift) && staminaManager.HasStamina(0.1f) ? sprintSpeed : moveSpeed;
-        float moveHorizontal = Input.GetAxis("Horizontal");
-        float moveVertical = Input.GetAxis("Vertical");
-        Vector3 move = new Vector3(moveHorizontal, 0, moveVertical).normalized * speed * Time.deltaTime;
-        rb.MovePosition(transform.position + transform.TransformDirection(move));
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+        Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
+        transform.Translate(direction * moveSpeed * Time.deltaTime);
+
+        // 속도 증가 지속 시간 확인
+        if (isSpeedBoosted && Time.time > speedBoostEndTime)
+        {
+            ResetSpeed();
+        }
 
         if (speed == sprintSpeed)
         {
@@ -92,7 +102,21 @@ public class PlayerController : MonoBehaviour
             objectInfoText.text = "";  // Raycast가 아무것도 감지하지 못하면 텍스트 숨기기
         }
     }
+    public void ApplySpeedBoost(float speedAmount, float duration)
+    {
+        if (!isSpeedBoosted)
+        {
+            moveSpeed *= speedAmount;
+            isSpeedBoosted = true;
+            speedBoostEndTime = Time.time + duration;
+        }
+    }
 
+    private void ResetSpeed()
+    {
+        moveSpeed = originalSpeed;
+        isSpeedBoosted = false;
+    }
     public void TakeDamage(float amount)
     {
         healthManager.TakeDamage(amount);
